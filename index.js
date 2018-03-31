@@ -733,26 +733,47 @@ class LinkBuilder{
 
 function main(){
     let linkBuilder = new LinkBuilder({'id' : 136, 'country' : 'fr'});
-    linkBuilder.target('universe');
-
     let ogameData = new RedisObjects(redis.createClient( { 'password' : redis_password.password } ));
-
+    let counter = 0;
+    
+    linkBuilder.target('universe');
     https.get(linkBuilder.request, (res)=>{
 	let xml = "";
 	res.on('data', (d) => { xml = xml + d; });
-
 	res.on('end', () => {
 	    parseString(xml, ( err, result ) => {
 		getPlanets(result, ogameData);
-		/*players.forEach( ( player ) => {
-		    console.log(player);
-		    });*/
-		ogameData.forEach( ( data ) => {
-		    console.log(data);
-		});
 	    });
+	    ++counter;
+	    console.log("end");
 	});
     });
+
+    console.log("after end");
+    
+    /*linkBuilder.target('players');
+    https.get(linkBuilder.request, (res)=>{
+	let xml = "";
+	res.on('data', (d) => { xml = xml + d; });
+	res.on('end', () => {
+	    parseString(xml, ( err, result ) => {
+		getPlayers(result, ogameData);
+	    });
+	    ++counter;
+	});
+    });
+
+    linkBuilder.target('alliances');
+    https.get(linkBuilder.request, (res)=>{
+	let xml = "";
+	res.on('data', (d) => { xml = xml + d; });
+	res.on('end', () => {
+	    parseString(xml, ( err, result ) => {
+		getAlliances(result, ogameData);
+	    });
+	    ++counter;
+	});
+    });*/
 }
 
 main();
