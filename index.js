@@ -316,10 +316,8 @@ function retrieveRedisData( redis_client, callback ){
     
     redisEventEmitter.on('retrieve', () => {
 	++counter;
-	if ( counter === 4 ){
-	    console.log("yay");
+	if ( counter === 4 )
 	    redis_objects.retrieve( callback );
-	}
     });
 }
 
@@ -723,6 +721,7 @@ class Alliance extends RedisObject{
 
 	allianceEventEmitter.on('retrieved', ()=>{
 	    ++count;
+	    console.log(count);
 	    if ( count === 7 )
 		retrieveEventEmitter.emit('finish');
 	    
