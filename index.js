@@ -3,7 +3,7 @@
  * This is also possible to retrieve data from the redis database.
  */
 const https = require("https");
-//const redis = require("redis");
+const redis = require("redis");
 const { parseString } = require("xml2js");
 //const { promisify } = require("util"); //Not used for the moment
 
@@ -734,7 +734,7 @@ function main(){
     let linkBuilder = new LinkBuilder({'id' : 136, 'country' : 'fr'});
     linkBuilder.target('universe');
 
-    let ogameData = new RedisObjects("TODO - PUT  REDIS CLIENT HERE");
+    let ogameData = new RedisObjects(redis.createClient());
 
     https.get(linkBuilder.request, (res)=>{
 	let xml = "";
@@ -746,9 +746,9 @@ function main(){
 		/*players.forEach( ( player ) => {
 		    console.log(player);
 		    });*/
-		/*ogameData.forEach( ( data ) => {
+		ogameData.forEach( ( data ) => {
 		    console.log(data);
-		});*/
+		});
 	    });
 	});
     });

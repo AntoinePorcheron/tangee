@@ -12,6 +12,7 @@
   "author": "Eratotin",
   "license": "MIT",
   "dependencies": {
+    "redis": "^2.8.0",
     "xml2js": "^0.4.19"
   }
 }
