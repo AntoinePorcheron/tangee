@@ -998,9 +998,9 @@ function main(){
     let redis_client = redis.createClient( { 'password' : redis_password.password } );
 
     retrieveRedisData( redis_client, ( reply ) => {
-	reply.forEach( ( e ) => {
+	/*reply.forEach( ( e ) => {
 	    console.log("e : ", e);
-	});
+	});*/
     });
 
     redisEventEmitter.on('end', ()=>{
