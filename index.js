@@ -491,7 +491,6 @@ class Player extends RedisObject{
 
     /* OVERRIDE */
     retrieve( redis_client ) {
-	console.log("player");
 	let count = 0;
 	redis_client.get(this.redis_name, function(error, reply){
 	    if ( error )
@@ -655,7 +654,6 @@ class Alliance extends RedisObject{
 
     /* OVERRIDE */
     retrieve( redis_client ){
-	console.log("alliance");
 	let count = 0;
 	redis_client.get(this.redis_name, function(error, reply){
 	    if ( error )
@@ -722,7 +720,7 @@ class Alliance extends RedisObject{
 
 	allianceEventEmitter.on("retrieved", ()=>{
 	    ++count;
-	    console.log(count);
+	    console.log("counter : ", count);
 	    if ( count === 7 )
 		retrieveEventEmitter.emit('finish');
 	    
@@ -809,7 +807,6 @@ class Planet extends RedisObject{
 
     /* OVERRIDE */
     retrieve( redis_client ){
-	console.log("planetes");
 	let count = 0;
 	redis_client.get(this.redis_player, (error, reply) => {
 	    if ( error )
@@ -906,7 +903,6 @@ class Moon extends RedisObject{
 
     /* OVERRIDE */
     retrieve( redis_client ){
-	console.log("moon");
 	let count = 0;
 	redis_client.get(this.redis_name, (error, reply)=> {
 	    if ( error )
@@ -997,18 +993,9 @@ class LinkBuilder{
 function main(){
     let redis_client = redis.createClient( { 'password' : redis_password.password } );
 
-    /*retrieveAPIData(136, 'fr', (datas) => {
-	datas.forEach( (data) => {
-	    console.log(data);
-	});
-    });*/
-
-    //redisEventEmitter.emit('end');
-
     retrieveRedisData( redis_client, ( reply ) => {
-	console.log("here");
 	reply.forEach( ( e ) => {
-	    console.log(e);
+	    console.log("e : ", e);
 	});
     });
 
