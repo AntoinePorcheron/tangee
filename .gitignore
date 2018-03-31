@@ -57,3 +57,5 @@ typings/
 # dotenv environment variables file
 .env
 
+# file with redis password
+redis_password.js
