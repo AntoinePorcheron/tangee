@@ -4,6 +4,7 @@
  */
 const https = require("https");
 const redis = require("redis");
+const EventEmitter = require("events");
 const { parseString } = require("xml2js");
 //const { promisify } = require("util"); //Not used for the moment
 const redis_password = require("./redis_password");
@@ -727,6 +728,8 @@ class LinkBuilder{
     }    
 }
 
+class HttpEventEmitter extends EventEmitter{}
+
 /*****************************************************************************************************
 ***                                        MAIN                                                    ***
 *****************************************************************************************************/
@@ -734,7 +737,7 @@ class LinkBuilder{
 function main(){
     let linkBuilder = new LinkBuilder({'id' : 136, 'country' : 'fr'});
     let ogameData = new RedisObjects(redis.createClient( { 'password' : redis_password.password } ));
-    let counter = 0;
+    let httpEventEmitter = new HttpEventEmitter();
     
     linkBuilder.target('universe');
     https.get(linkBuilder.request, (res)=>{
@@ -744,36 +747,45 @@ function main(){
 	    parseString(xml, ( err, result ) => {
 		getPlanets(result, ogameData);
 	    });
-	    ++counter;
-	    console.log("end");
+	    httpEventEmitter.emit('universe');
 	});
     });
 
-    console.log("after end");
+    httpEventEmitter.on('universe', ()=>{	
+	linkBuilder.target('players');
+	https.get(linkBuilder.request, (res)=>{
+	    let xml = "";
+	    res.on('data', (d) => { xml = xml + d; });
+	    res.on('end', () => {
+		parseString(xml, ( err, result ) => {
+		    getPlayers(result, ogameData);
+		});
+		httpEventEmitter.emit('players');
+	    });
+	});
+    });
+
     
-    /*linkBuilder.target('players');
-    https.get(linkBuilder.request, (res)=>{
-	let xml = "";
-	res.on('data', (d) => { xml = xml + d; });
-	res.on('end', () => {
-	    parseString(xml, ( err, result ) => {
-		getPlayers(result, ogameData);
+    httpEventEmitter.on('players', ()=>{
+	linkBuilder.target('alliances');
+	https.get(linkBuilder.request, (res)=>{
+	    let xml = "";
+	    res.on('data', (d) => { xml = xml + d; });
+	    res.on('end', () => {
+		parseString(xml, ( err, result ) => {
+		    getAlliances(result, ogameData);
+		});
+		httpEventEmitter.emit('end');
 	    });
-	    ++counter;
 	});
     });
 
-    linkBuilder.target('alliances');
-    https.get(linkBuilder.request, (res)=>{
-	let xml = "";
-	res.on('data', (d) => { xml = xml + d; });
-	res.on('end', () => {
-	    parseString(xml, ( err, result ) => {
-		getAlliances(result, ogameData);
-	    });
-	    ++counter;
+    httpEventEmitter.on('end', ()=>{
+	console.log("all finished");
+	ogameData.forEach( ( element ) => {
+	    console.log(element);
 	});
-    });*/
+    });
 }
 
 main();
