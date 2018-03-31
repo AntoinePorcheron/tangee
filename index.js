@@ -777,3 +777,4 @@ function main(){
 }
 
 main();
+console.log("after main");
