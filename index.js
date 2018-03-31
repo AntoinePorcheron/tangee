@@ -316,9 +316,10 @@ function retrieveRedisData( redis_client, callback ){
     
     redisEventEmitter.on('retrieve', () => {
 	++counter;
-	console.log(counter);
-	if ( counter == 4 )
+	if ( counter === 4 ){
+	    console.log("yay");
 	    redis_objects.retrieve( callback );
+	}
     });
 }
 
