@@ -359,6 +359,7 @@ class RedisObjects extends Array{
 	    this.forEach( ( object ) => {
 		++count;
 		object.retrieve( this._client );
+		console.log(count);
 		if ( count === object.length - 1 )
 		    callback(this);
 	    });
@@ -922,6 +923,7 @@ function main(){
     });
 
     redisEventEmitter.on('end', ()=>{
+	console.log("HERE");
 	redis_client.quit();
     });
 }
