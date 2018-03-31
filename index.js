@@ -481,10 +481,6 @@ class Player extends RedisObject{
 	return getRedisID("player", "score", this.id);
     }
 
-    get redis_whole(){
-	return getRedisID("player", "*", this.id);
-    }
-
     /* OVERRIDE */
     save( redis_client ){
 	redis_client.set(this.redis_name, this.name);
@@ -496,7 +492,7 @@ class Player extends RedisObject{
     /* OVERRIDE */
     retrieve( redis_client ) {
 	let count = 0;
-	redis_client.get(this.redis_name, function(error, reply){
+	redis_client.get(this.redis_name, (error, reply)=>{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
@@ -505,7 +501,7 @@ class Player extends RedisObject{
 	    }
 	});
 
-	redis_client.get(this.redis_alliance, function(error, reply){
+	redis_client.get(this.redis_alliance, (error, reply)=>{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
@@ -515,7 +511,7 @@ class Player extends RedisObject{
 	    
 	});
 
-	redis_client.get(this.redis_status, function(error, reply){
+	redis_client.get(this.redis_status, (error, reply)=>{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
@@ -524,7 +520,7 @@ class Player extends RedisObject{
 	    }
 	});
 
-	redis_client.get(this.redis_score, function(error, reply){
+	redis_client.get(this.redis_score, (error, reply)=>{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
@@ -535,7 +531,6 @@ class Player extends RedisObject{
 
 	this._playerEventEmitter.on('retrieved', ()=>{
 	    ++count;
-	    console.log("player : ", count);
 	    if ( count === 4 )
 		retrieveEventEmitter.emit('finish');
 	});
@@ -661,7 +656,7 @@ class Alliance extends RedisObject{
     /* OVERRIDE */
     retrieve( redis_client ){
 	let count = 0;
-	redis_client.get(this.redis_name, function(error, reply){
+	redis_client.get(this.redis_name, (error, reply)=>{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
@@ -670,7 +665,7 @@ class Alliance extends RedisObject{
 	    }
 	});
 
-	redis_client.get(this.redis_tag, function(error, reply){
+	redis_client.get(this.redis_tag, (error, reply)=>{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
@@ -679,7 +674,7 @@ class Alliance extends RedisObject{
 	    }
 	});
 
-	redis_client.get(this.redis_founder, function(error, reply){
+	redis_client.get(this.redis_founder, (error, reply)=>{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
@@ -688,7 +683,7 @@ class Alliance extends RedisObject{
 	    }
 	});
 
-	redis_client.get(this.redis_foundDate, function(error, reply){
+	redis_client.get(this.redis_foundDate, (error, reply)=>{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
@@ -697,7 +692,7 @@ class Alliance extends RedisObject{
 	    }
 	});
 
-	redis_client.get(this.redis_homepage, function(error, reply){
+	redis_client.get(this.redis_homepage, (error, reply)=>{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
@@ -706,7 +701,7 @@ class Alliance extends RedisObject{
 	    }
 	});
 
-	redis_client.get(this.redis_logo, function(error, reply){
+	redis_client.get(this.redis_logo, (error, reply)=>{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
@@ -715,7 +710,7 @@ class Alliance extends RedisObject{
 	    }
 	});
 
-	redis_client.get(this.redis_open, function(error, reply){
+	redis_client.get(this.redis_open, (error, reply)=>{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
@@ -726,7 +721,6 @@ class Alliance extends RedisObject{
 
 	this._allianceEventEmitter.on("retrieved", ()=>{
 	    ++count;
-	    console.log("counter : ", count);
 	    if ( count === 7 )
 		retrieveEventEmitter.emit('finish');
 	    
