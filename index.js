@@ -243,7 +243,7 @@ function retrieveRedisData( redis_client, callback ){
 	    let counter = 0;
 	    replies.forEach( (reply) => {
 		++counter;
-		redis_objects.push(new Player({ 'id' : parsedID(reply) }));
+		redis_objects.push(new Player({ 'id' : parseID(reply) }));
 		if ( counter === reply.length - 1 )
 		    redisEventEmitter.emit('end');
 	    });
