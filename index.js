@@ -924,7 +924,7 @@ function main(){
 
     redisEventEmitter.on('end', ()=>{
 	console.log("HERE");
-	redis_client.quit();
+	/*redis_client.quit();*/
     });
 }
 
