@@ -381,7 +381,6 @@ class RedisObjects extends Array{
 
 		retrieveEventEmitter.on("finish", ()=>{
 		    ++count;
-		    console.log(count / this.length);
 		    if ( count === this.length )
 			callback(this);
 		});
@@ -532,8 +531,10 @@ class Player extends RedisObject{
 
 	this._playerEventEmitter.on('retrieved', ()=>{
 	    ++count;
-	    if ( count === 4 )
+	    if ( count === 4 ){
+		console.log(this);
 		retrieveEventEmitter.emit('finish');
+	    }
 	});
     }
 }
