@@ -294,11 +294,8 @@ function retrieveRedisData( redis_client, callback ){
     
     redisEventEmitter.on('retrieve', () => {
 	++counter;
-	if ( counter == 4 ){
+	if ( counter == 4 )
 	    redis_objects.retrieve( callback );
-	    /*callback( redis_objects );*/
-	}
-	
     });
 }
 
@@ -359,7 +356,6 @@ class RedisObjects extends Array{
 	    this.forEach( ( object ) => {
 		++count;
 		object.retrieve( this._client );
-		console.log(count);
 		if ( count === object.length - 1 )
 		    callback(this);
 	    });
@@ -917,6 +913,7 @@ function main(){
     //redisEventEmitter.emit('end');
 
     retrieveRedisData( redis_client, ( reply ) => {
+	console.log("here");
 	reply.forEach( ( e ) => {
 	    console.log(e);
 	});
