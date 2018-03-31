@@ -245,7 +245,7 @@ function retrieveRedisData( redis_client, callback ){
 		++counter;
 		redis_objects.push(new Player({ 'id' : parseID(reply) }));
 		if ( counter === reply.length - 1 )
-		    redisEventEmitter.emit('end');
+		    redisEventEmitter.emit('retrieve');
 	    });
 	}
     });
@@ -259,7 +259,7 @@ function retrieveRedisData( redis_client, callback ){
 		++counter;
 		redis_objects.push(new Planet({ 'id' : parseID(reply) }));
 		if ( counter === reply.length - 1 )
-		    redisEventEmitter.emit('end');
+		    redisEventEmitter.emit('retrieve');
 	    });
 	}
     });
@@ -273,7 +273,7 @@ function retrieveRedisData( redis_client, callback ){
 		++counter;
 		redis_objects.push(new Alliance({ 'id' : parseID(reply) }));
 		if ( counter === reply.length - 1 )
-		    redisEventEmitter.emit('end');
+		    redisEventEmitter.emit('retrieve');
 	    });
 	}
     });
@@ -287,12 +287,12 @@ function retrieveRedisData( redis_client, callback ){
 		++counter;
 		redis_objects.push(new Moon({ 'id' : parseID(reply) }));
 		if ( counter === reply.length - 1 )
-		    redisEventEmitter.emit('end');
+		    redisEventEmitter.emit('retrieve');
 	    });
 	}
     });
     
-    redisEventEmitter.on('end', () => {
+    redisEventEmitter.on('retrieve', () => {
 	++counter;
 	if ( counter == 4 ){
 	    redis_objects.retrieve( callback );
@@ -923,8 +923,7 @@ function main(){
     });
 
     redisEventEmitter.on('end', ()=>{
-	console.log("HERE");
-	/*redis_client.quit();*/
+	redis_client.quit();
     });
 }
 
