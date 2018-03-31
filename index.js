@@ -117,7 +117,6 @@ function getAlliances(xml, redisObjects){
     let alliances = xml.alliances.alliance;
     alliances.forEach( (alliance) => {
 	redisObjects.push(new Alliance(alliance.$));
-	/*console.log(alliance.$);*/
     });
 }
 
@@ -160,7 +159,7 @@ function getRedisID(service, attributes, id){
  * @param server_country : the country identifier of the OGame server
  * @param redis_client : the redis client to the database
  */
-function retrieveAPIData( server_id, server_country, redis_client, callback ){
+function retrieveAPIData( server_id, server_country, callback ){
     let linkBuilder = new LinkBuilder({'id' : server_id, 'country' : server_country});
     let ogameData = new RedisObjects( redis_client );
     let count = 0;
@@ -203,9 +202,8 @@ function retrieveAPIData( server_id, server_country, redis_client, callback ){
     httpEventEmitter.on('end', ()=>{
 	++count;
 	if ( count === 3 ){
-	    ogameData.save();
-	    callback( ogameData );
 	    redisEventEmitter.emit('end');
+	    callback( ogameData );
 	}
     });
 }
@@ -289,7 +287,6 @@ function retrieveRedisData( redis_client, callback ){
 	if ( counter == 4 ){
 	    redis_object.retrieve();
 	    callback( redis_object );
-	    redisEventEmitter.emit('end');
 	}
 	
     });
@@ -332,7 +329,6 @@ class RedisObjects extends Array{
      */
     save(){
 	this.forEach( ( object ) => {
-	    console.log("Saving objects...", object);
 	    object.save( this._client );
 	});
     }
@@ -894,10 +890,11 @@ function main(){
 	});
     });
 
+    //redisEventEmitter.emit('end');
+
     redisEventEmitter.on('end', ()=>{
 	redis_client.quit();
     });
 }
 
 main();
-console.log("after main");
