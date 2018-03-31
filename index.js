@@ -51,6 +51,11 @@ const redis_password = require("./redis_password");
  *          - list of servers : universes
  */
 
+/**
+ * Problem found : 
+ * The 
+ */
+
 /******************************************************************************************************
  ***                                           Event classes                                         ***
  ******************************************************************************************************/
@@ -69,10 +74,6 @@ class MoonEventEmitter extends EventEmitter{}
 let redisEventEmitter = new RedisEventEmitter();
 let httpEventEmitter = new HttpEventEmitter();
 let retrieveEventEmitter = new RetrieveEventEmitter();
-let playerEventEmitter = new PlayerEventEmitter();
-let allianceEventEmitter = new AllianceEventEmitter();
-let planetEventEmitter = new PlanetEventEmitter();
-let moonEventEmitter = new MoonEventEmitter();
 
 /******************************************************************************************************
  ***                                           Error class                                          ***
@@ -421,6 +422,7 @@ class Player extends RedisObject{
 	this._alliance = ( isUndefined(object.alliance) ? -1 : parseInt(object.alliance) );
 	this._status = ( isUndefined(object.status) ? "op" : object.status );
 	this._score = ( isUndefined(object.score) ? 0 : object.score );
+	this._playerEventEmitter = new PlayerEventEmitter();
     }
 
     get id(){
@@ -499,7 +501,7 @@ class Player extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.name = reply;
-		playerEventEmitter.emit('retrieved');
+		this._playerEventEmitter.emit('retrieved');
 	    }
 	});
 
@@ -507,8 +509,8 @@ class Player extends RedisObject{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
-		playerEventEmitter.emit('retrieved');
 		this.alliance = reply;
+		this._playerEventEmitter.emit('retrieved');
 	    }
 	    
 	});
@@ -517,8 +519,8 @@ class Player extends RedisObject{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
-		playerEventEmitter.emit('retrieved');
 		this.status = reply;
+		this._playerEventEmitter.emit('retrieved');
 	    }
 	});
 
@@ -526,12 +528,12 @@ class Player extends RedisObject{
 	    if ( error )
 		throw new RedisError( error );
 	    else{
-		playerEventEmitter.emit('retrieved');
 		this.score = reply;
+		this._playerEventEmitter.emit('retrieved');
 	    }
 	});
 
-	playerEventEmitter.on('retrieved', ()=>{
+	this._playerEventEmitter.on('retrieved', ()=>{
 	    ++count;
 	    console.log("player : ", count);
 	    if ( count === 4 )
@@ -554,6 +556,7 @@ class Alliance extends RedisObject{
 	this._homepage = ( isUndefined(object.homepage) ? "" : object.homepage );
 	this._logo = ( isUndefined(object.logo) ? "" : object.logo );
 	this._isOpen = ( isUndefined(object.open) ? false : true );
+	this._allianceEventEmitter = new AllianceEventEmitter();
     }
 
     get id(){
@@ -663,7 +666,7 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.name = reply;
-		allianceEventEmitter.emit("retrieved");
+		this._allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
@@ -672,7 +675,7 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.tag = reply;
-		allianceEventEmitter.emit("retrieved");
+		this._allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
@@ -681,7 +684,7 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.founder = reply;
-		allianceEventEmitter.emit("retrieved");
+		this._allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
@@ -690,7 +693,7 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.foundDate = reply;
-		allianceEventEmitter.emit("retrieved");
+		this._allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
@@ -699,7 +702,7 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.homepage = reply;
-		allianceEventEmitter.emit("retrieved");
+		this._allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
@@ -708,7 +711,7 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.logo = reply;
-		allianceEventEmitter.emit("retrieved");
+		this._allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
@@ -717,11 +720,11 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.open = reply;
-		allianceEventEmitter.emit("retrieved");
+		this._allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
-	allianceEventEmitter.on("retrieved", ()=>{
+	this._allianceEventEmitter.on("retrieved", ()=>{
 	    ++count;
 	    console.log("counter : ", count);
 	    if ( count === 7 )
@@ -742,6 +745,7 @@ class Planet extends RedisObject{
 	this._name = ( isUndefined(object.name) ? '' : object.name );
 	this._coords = ( isUndefined(object.coords) ? '' :  object.coords ); 
 	this._moon = moonId; // I don't quite like this solution, but will do the tricks.
+	this._planetEventEmitter = new PlanetEventEmitter();
     }
 
     get id(){
@@ -816,7 +820,7 @@ class Planet extends RedisObject{
 		throw new RedisError(error);
 	    else{
 		this.player = reply;
-		planetEventEmitter.emit('retrieved');
+		this._planetEventEmitter.emit('retrieved');
 	    }
 	});
 
@@ -825,7 +829,7 @@ class Planet extends RedisObject{
 		throw new RedisError(error);
 	    else{
 		this.name = reply;
-		planetEventEmitter.emit('retrieved');
+		this._planetEventEmitter.emit('retrieved');
 	    }
 	});
 
@@ -834,7 +838,7 @@ class Planet extends RedisObject{
 		throw new RedisError(error);
 	    else{
 		this.coordinate = reply;
-		planetEventEmitter.emit('retrieved');
+		this._planetEventEmitter.emit('retrieved');
 	    }
 	});
 
@@ -843,11 +847,11 @@ class Planet extends RedisObject{
 		throw new RedisError(error);
 	    else{
 		this.moon = reply;
-		planetEventEmitter.emit('retrieved');
+		this._planetEventEmitter.emit('retrieved');
 	    }
 	});
 	
-	planetEventEmitter.on('retrieved', ()=>{
+	this._planetEventEmitter.on('retrieved', ()=>{
 	    ++count;
 	    if ( count === 4 )
 		retrieveEventEmitter.emit('finish');
@@ -864,6 +868,7 @@ class Moon extends RedisObject{
 	this._id = object.id;
 	this._name = ( isUndefined(object.name) ? '' : object.name );
 	this._size = ( isUndefined(object.size) ? '' : object.size );
+	this._moonEventEmitter = new MoonEventEmitter();
     }
 
     get id(){
@@ -912,7 +917,7 @@ class Moon extends RedisObject{
 		throw new RedisError;
 	    else{
 		this.name = reply;
-		moonEventEmitter.emit("retrieved");
+		this._moonEventEmitter.emit("retrieved");
 	    }
 	});
 
@@ -921,11 +926,11 @@ class Moon extends RedisObject{
 		throw new RedisError;
 	    else{
 		this.size = reply;
-		moonEventEmitter.emit("retrieved");
+		this._moonEventEmitter.emit("retrieved");
 	    }
 	});
 
-	moonEventEmitter.on("retrieved", ()=>{
+	this._moonEventEmitter.on("retrieved", ()=>{
 	    ++count;
 	    if ( count === 2 )
 		retrieveEventEmitter.emit('finish');
