@@ -16,7 +16,9 @@ const redis_password = require("./redis_password");
  * like so : ogame_*_<class>_*.
  *            - use promises 
  *            - Correct the redis call. ( I only use get at the moment, therefore this isn't functional
- * and this should use keys before. )
+ * and this should use keys before. ) <- Maybe I'm just dumb, I can rebuild properly the id with 
+ * the object ID without querying on the database.
+ * 
  * Setup : 
  *            - Setting up redis database.
  */
@@ -36,6 +38,12 @@ const redis_password = require("./redis_password");
  *          - meanings : localization //TODO : check this out
  *          - list of servers : universes
  */
+
+/******************************************************************************************************
+***                                            Global vars                                          ***
+******************************************************************************************************/
+let redisEventEmitter = new RedisEventEmitter();
+let httpEventEmitter = new HttpEventEmitter();
 
 /******************************************************************************************************
  ***                                           Error class                                          ***
@@ -139,6 +147,147 @@ function getRedisID(service, attributes, id){
     return `ogame_${service}_${attributes}_${id}`;
 }
 
+/**
+ * Function that connect to the OGame API, and save datas on the redis server.
+ * @param server_id : the OGame server ID
+ * @param server_country : the country identifier of the OGame server
+ * @param redis_client : the redis client to the database
+ */
+function retrieveAPIData( server_id, server_country, redis_client, callback ){
+    let linkBuilder = new LinkBuilder({'id' : server_id, 'country' : server_country});
+    let ogameData = new RedisObjects( redis_client );
+    let count = 0;
+    
+    linkBuilder.target('universe');
+    https.get(linkBuilder.request, (res)=>{
+	let xml = "";
+	res.on('data', (d) => { xml = xml + d; });
+	res.on('end', () => {
+	    parseString(xml, ( err, result ) => {
+		getPlanets(result, ogameData);
+	    });
+	    httpEventEmitter.emit('end');
+	});
+    });
+
+    linkBuilder.target('players');
+    https.get(linkBuilder.request, (res)=>{
+	let xml = "";
+	res.on('data', (d) => { xml = xml + d; });
+	res.on('end', () => {
+	    parseString(xml, ( err, result ) => {
+		getPlayers(result, ogameData);
+	    });
+	    httpEventEmitter.emit('end');
+	});
+    });
+    linkBuilder.target('alliances');
+    https.get(linkBuilder.request, (res)=>{
+	let xml = "";
+	res.on('data', (d) => { xml = xml + d; });
+	res.on('end', () => {
+	    parseString(xml, ( err, result ) => {
+		getAlliances(result, ogameData);
+	    });
+	    httpEventEmitter.emit('end');
+	});
+    });
+
+    httpEventEmitter.on('end', ()=>{
+	++count;
+	if ( count === 3 ){
+	    ogameData.save();
+	    callback( ogameData );
+	    redisEventEmitter.emit('end');
+	}
+    });
+}
+
+/**
+ * Function that retrieve the concerned ID from a redis key
+ * @param redis_key : the key to parse in which we want to retrieve the ID
+ * @return the id contained in the key
+ */
+function parseID( redis_key ){
+    let parsed_key = redis_key.split('_');
+    return parsed_key[parsed_key.length - 1];
+}
+
+/**
+ * Retrieve planets, players and alliances data from the redis server
+ * @param redis_client : the redis client to the database
+ */
+function retrieveRedisData( redis_client, callback ){
+    let redis_objects = new RedisObjects( redis_client );
+    let counter = 0;
+    
+    redis_client.keys('ogame_player_name_*', ( error , replies )=>{
+	if ( error )
+	    throw new RedisError();
+	else{
+	    let counter = 0;
+	    replies.forEach( (reply) => {
+		++counter;
+		redis_object.push(new Player({ 'id' : parsedID(reply) }));
+		if ( counter === reply.length - 1 )
+		    redisEventEmitter.emit('end');
+	    });
+	}
+    });
+
+    redis_client.keys('ogame_planet_name_*', ( error , replies )=>{
+	if ( error )
+	    throw new RedisError();
+	else{
+	    let counter = 0;
+	    replies.forEach( (reply) => {
+		++counter;
+		redis_object.push(new Planet({ 'id' : parsedID(reply) }));
+		if ( counter === reply.length - 1 )
+		    redisEventEmitter.emit('end');
+	    });
+	}
+    });
+
+    redis_client.keys('ogame_alliance_name_*', ( error , replies )=>{
+	if ( error )
+	    throw new RedisError();
+	else{
+	    let counter = 0;
+	    replies.forEach( (reply) => {
+		++counter;
+		redis_object.push(new Alliance({ 'id' : parsedID(reply) }));
+		if ( counter === reply.length - 1 )
+		    redisEventEmitter.emit('end');
+	    });
+	}
+    });
+
+    redis_client.keys('ogame_moon_name_*', ( error , replies )=>{
+	if ( error )
+	    throw new RedisError();
+	else{
+	    let counter = 0;
+	    replies.forEach( (reply) => {
+		++counter;
+		redis_object.push(new Moon({ 'id' : parsedID(reply) }));
+		if ( counter === reply.length - 1 )
+		    redisEventEmitter.emit('end');
+	    });
+	}
+    });
+    
+    redisEventEmitter.on('end', () => {
+	++counter;
+	if ( counter == 4 ){
+	    redis_object.retrieve();
+	    callback( redis_object );
+	    redisEventEmitter.emit('end');
+	}
+	
+    });
+}
+
 /******************************************************************************************************
 ***                                       Classes                                                   ***
 ******************************************************************************************************/
@@ -219,7 +368,7 @@ class Player extends RedisObject{
     constructor( object ){
 	super();
 	this._id = parseInt(object.id);
-	this._name = object.name;
+	this._name = ( isUndefined(object.name) ? '' : object.name );
 	this._alliance = ( isUndefined(object.alliance) ? -1 : parseInt(object.alliance) );
 	this._status = ( isUndefined(object.status) ? "op" : object.status );
 	this._score = ( isUndefined(object.score) ? 0 : object.score );
@@ -332,10 +481,10 @@ class Alliance extends RedisObject{
     constructor( object ){
 	super();
 	this._id = object.id;
-	this._name = object.name;
-	this._tag = object.tag;
-	this._founder = object.founder;
-	this.foundDate = object.foundDate;
+	this._name = ( isUndefined(object.name) ? '' : object.name ) ;
+	this._tag = ( isUndefined(object.tag) ? '' : object.tag );
+	this._founder = ( isUndefined(object.founder) ? '' : object.founder );
+	this.foundDate = ( isUndefined(object.foundDate) ? '' : object.foundDate );
 	this._homepage = ( isUndefined(object.homepage) ? "" : object.homepage );
 	this._logo = ( isUndefined(object.logo) ? "" : object.logo );
 	this._isOpen = ( isUndefined(object.open) ? false : true );
@@ -499,10 +648,10 @@ class Alliance extends RedisObject{
 class Planet extends RedisObject{
     constructor( object, moonId ){
 	super();
-	this._id = parseInt(object.id);
-	this._playerId = parseInt(object.player);
-	this._name = object.name;
-	this._coords = object.coords;
+	this._id = object.id;
+	this._playerId = ( isUndefined(object.player) ? '' : object.player );
+	this._name = ( isUndefined(object.name) ? '' : object.name );
+	this._coords = ( isUndefined(object.coords) ? '' :  object.coords ); 
 	this._moon = moonId; // I don't quite like this solution, but will do the tricks.
     }
 
@@ -609,8 +758,8 @@ class Moon extends RedisObject{
     constructor( object ){
 	super();
 	this._id = object.id;
-	this._name = object.name;
-	this._size = object.size;
+	this._name = ( isUndefined(object.name) ? '' : object.name );
+	this._size = ( isUndefined(object.size) ? '' : object.size );
     }
 
     get id(){
@@ -727,62 +876,23 @@ class LinkBuilder{
 }
 
 class HttpEventEmitter extends EventEmitter{}
+class RedisEventEmitter extends EventEmitter{}
 
 /*****************************************************************************************************
 ***                                        MAIN                                                    ***
 *****************************************************************************************************/
 
 function main(){
-    let linkBuilder = new LinkBuilder({'id' : 136, 'country' : 'fr'});
-    let ogameData = new RedisObjects(redis.createClient( { 'password' : redis_password.password } ));
-    let httpEventEmitter = new HttpEventEmitter();
-    
-    linkBuilder.target('universe');
-    https.get(linkBuilder.request, (res)=>{
-	let xml = "";
-	res.on('data', (d) => { xml = xml + d; });
-	res.on('end', () => {
-	    parseString(xml, ( err, result ) => {
-		getPlanets(result, ogameData);
-	    });
-	    httpEventEmitter.emit('universe');
+    let redis_client = redis.createClient( { 'password' : redis_password.password } );
+
+    retrieveAPIData(136, 'fr', redis_client, (datas) => {
+	datas.forEach( (data) => {
+	    console.log(data);
 	});
     });
 
-    httpEventEmitter.on('universe', ()=>{	
-	linkBuilder.target('players');
-	https.get(linkBuilder.request, (res)=>{
-	    let xml = "";
-	    res.on('data', (d) => { xml = xml + d; });
-	    res.on('end', () => {
-		parseString(xml, ( err, result ) => {
-		    getPlayers(result, ogameData);
-		});
-		httpEventEmitter.emit('players');
-	    });
-	});
-    });
-
-    
-    httpEventEmitter.on('players', ()=>{
-	linkBuilder.target('alliances');
-	https.get(linkBuilder.request, (res)=>{
-	    let xml = "";
-	    res.on('data', (d) => { xml = xml + d; });
-	    res.on('end', () => {
-		parseString(xml, ( err, result ) => {
-		    getAlliances(result, ogameData);
-		});
-		httpEventEmitter.emit('end');
-	    });
-	});
-    });
-
-    httpEventEmitter.on('end', ()=>{
-	ogameData.save();
-	/*ogameData.forEach( ( element ) => {
-	    console.log(element);
-	});*/
+    redisEventEmitter.on('end', ()=>{
+	redis_client.quit();
     });
 }
 
