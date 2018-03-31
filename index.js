@@ -243,7 +243,7 @@ function retrieveRedisData( redis_client, callback ){
 	    let counter = 0;
 	    replies.forEach( (reply) => {
 		++counter;
-		redis_object.push(new Player({ 'id' : parsedID(reply) }));
+		redis_objects.push(new Player({ 'id' : parsedID(reply) }));
 		if ( counter === reply.length - 1 )
 		    redisEventEmitter.emit('end');
 	    });
@@ -257,7 +257,7 @@ function retrieveRedisData( redis_client, callback ){
 	    let counter = 0;
 	    replies.forEach( (reply) => {
 		++counter;
-		redis_object.push(new Planet({ 'id' : parsedID(reply) }));
+		redis_objects.push(new Planet({ 'id' : parsedID(reply) }));
 		if ( counter === reply.length - 1 )
 		    redisEventEmitter.emit('end');
 	    });
@@ -271,7 +271,7 @@ function retrieveRedisData( redis_client, callback ){
 	    let counter = 0;
 	    replies.forEach( (reply) => {
 		++counter;
-		redis_object.push(new Alliance({ 'id' : parsedID(reply) }));
+		redis_objects.push(new Alliance({ 'id' : parsedID(reply) }));
 		if ( counter === reply.length - 1 )
 		    redisEventEmitter.emit('end');
 	    });
@@ -285,7 +285,7 @@ function retrieveRedisData( redis_client, callback ){
 	    let counter = 0;
 	    replies.forEach( (reply) => {
 		++counter;
-		redis_object.push(new Moon({ 'id' : parsedID(reply) }));
+		redis_objects.push(new Moon({ 'id' : parsedID(reply) }));
 		if ( counter === reply.length - 1 )
 		    redisEventEmitter.emit('end');
 	    });
@@ -295,8 +295,8 @@ function retrieveRedisData( redis_client, callback ){
     redisEventEmitter.on('end', () => {
 	++counter;
 	if ( counter == 4 ){
-	    redis_object.retrieve();
-	    callback( redis_object );
+	    redis_objects.retrieve();
+	    callback( redis_objects );
 	}
 	
     });
