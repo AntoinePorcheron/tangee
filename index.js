@@ -491,6 +491,7 @@ class Player extends RedisObject{
 
     /* OVERRIDE */
     retrieve( redis_client ) {
+	console.log("player");
 	let count = 0;
 	redis_client.get(this.redis_name, function(error, reply){
 	    if ( error )
@@ -654,7 +655,7 @@ class Alliance extends RedisObject{
 
     /* OVERRIDE */
     retrieve( redis_client ){
-
+	console.log("alliance");
 	let count = 0;
 	redis_client.get(this.redis_name, function(error, reply){
 	    if ( error )
@@ -715,7 +716,6 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.open = reply;
-		console.log("here?");
 		allianceEventEmitter.emit("retrieved");
 	    }
 	});
@@ -809,6 +809,7 @@ class Planet extends RedisObject{
 
     /* OVERRIDE */
     retrieve( redis_client ){
+	console.logg("planetes");
 	let count = 0;
 	redis_client.get(this.redis_player, (error, reply) => {
 	    if ( error )
@@ -905,6 +906,7 @@ class Moon extends RedisObject{
 
     /* OVERRIDE */
     retrieve( redis_client ){
+	console.log("moon");
 	let count = 0;
 	redis_client.get(this.redis_name, (error, reply)=> {
 	    if ( error )
