@@ -354,7 +354,7 @@ class RedisObjects extends Array{
 	if ( isUndefined( this._client ) )
 	    throw new NoRedisClientError();
 	else{
-	    this._objects.forEach( ( object ) => {
+	    this.forEach( ( object ) => {
 		object.retrieve( this._client );
 	    });
 	}
