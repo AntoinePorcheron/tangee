@@ -165,8 +165,6 @@ class RedisObjects extends Array{
 	// We'll continue to do like this for RedisObject subclass for now, but should
 	// be updated.
 
-	/* objects to save on the redis client. These object should all be RedisObject subclasses,
-	 * or must at least implement method save( redis_client ) and retrieve( redis_client ) */
     }
 
     get objects(){
@@ -177,7 +175,6 @@ class RedisObjects extends Array{
      * Save all the objects on the redis database.
      */
     save(){
-	console.log(
 	this.forEach( ( object ) => {
 	    console.log("Saving objects...", object);
 	    object.save( this._client );
