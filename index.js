@@ -809,7 +809,7 @@ class Planet extends RedisObject{
 
     /* OVERRIDE */
     retrieve( redis_client ){
-	console.logg("planetes");
+	console.log("planetes");
 	let count = 0;
 	redis_client.get(this.redis_player, (error, reply) => {
 	    if ( error )
