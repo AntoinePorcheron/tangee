@@ -470,8 +470,10 @@ class Player extends RedisObject{
 	redis_client.get(this.redis_name, function(error, reply){
 	    if ( error )
 		throw new RedisError( error );
-	    else
+	    else{
+		console.log(reply)
 		this.name = reply;
+	    }
 	});
 
 	redis_client.get(this.redis_alliance, function(error, reply){
