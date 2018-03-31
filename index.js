@@ -52,8 +52,8 @@ const redis_password = require("./redis_password");
  */
 
 /******************************************************************************************************
-***                                           Event classes                                         ***
-******************************************************************************************************/
+ ***                                           Event classes                                         ***
+ ******************************************************************************************************/
 class HttpEventEmitter extends EventEmitter{}
 class RedisEventEmitter extends EventEmitter{}
 class RetrieveEventEmitter extends EventEmitter{}
@@ -64,8 +64,8 @@ class MoonEventEmitter extends EventEmitter{}
 
 
 /******************************************************************************************************
-***                                            Global vars                                          ***
-******************************************************************************************************/
+ ***                                            Global vars                                          ***
+ ******************************************************************************************************/
 let redisEventEmitter = new RedisEventEmitter();
 let httpEventEmitter = new HttpEventEmitter();
 let retrieveEventEmitter = new RetrieveEventEmitter();
@@ -109,8 +109,8 @@ class NoRedisClientError extends Error{
 }
 
 /*****************************************************************************************************
-***                                         Utility function                                       ***
-******************************************************************************************************/
+ ***                                         Utility function                                       ***
+ ******************************************************************************************************/
 
 /**
  * Function that warn if object is undefined.
@@ -322,8 +322,8 @@ function retrieveRedisData( redis_client, callback ){
 }
 
 /******************************************************************************************************
-***                                       Classes                                                   ***
-******************************************************************************************************/
+ ***                                       Classes                                                   ***
+ ******************************************************************************************************/
 
 /**
  * Handler to save and retrieve classes easily on a redis server.
@@ -531,6 +531,7 @@ class Player extends RedisObject{
 
 	playerEventEmitter.on('retrieved', ()=>{
 	    ++count;
+	    console.log("player : ", count);
 	    if ( count === 4 )
 		retrieveEventEmitter.emit('finish');
 	});
@@ -987,8 +988,8 @@ class LinkBuilder{
     }    
 }
 /*****************************************************************************************************
-***                                        MAIN                                                    ***
-*****************************************************************************************************/
+ ***                                        MAIN                                                    ***
+ *****************************************************************************************************/
 
 function main(){
     let redis_client = redis.createClient( { 'password' : redis_password.password } );
