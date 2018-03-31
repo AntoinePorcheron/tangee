@@ -661,7 +661,7 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.name = reply;
-		allianceEventEmitter.emit('retrieved');
+		allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
@@ -670,7 +670,7 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.tag = reply;
-		allianceEventEmitter.emit('retrieved');
+		allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
@@ -679,7 +679,7 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.founder = reply;
-		allianceEventEmitter.emit('retrieved');
+		allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
@@ -688,7 +688,7 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.foundDate = reply;
-		allianceEventEmitter.emit('retrieved');
+		allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
@@ -697,7 +697,7 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.homepage = reply;
-		allianceEventEmitter.emit('retrieved');
+		allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
@@ -706,7 +706,7 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.logo = reply;
-		allianceEventEmitter.emit('retrieved');
+		allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
@@ -715,11 +715,12 @@ class Alliance extends RedisObject{
 		throw new RedisError( error );
 	    else{
 		this.open = reply;
-		allianceEventEmitter.emit('retrieved');
+		console.log("here?");
+		allianceEventEmitter.emit("retrieved");
 	    }
 	});
 
-	allianceEventEmitter.on('retrieved', ()=>{
+	allianceEventEmitter.on("retrieved", ()=>{
 	    ++count;
 	    console.log(count);
 	    if ( count === 7 )
