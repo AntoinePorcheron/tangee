@@ -179,6 +179,7 @@ class RedisObjects extends Array{
      */
     save(){
 	this._objects.forEach( ( object ) => {
+	    console.log("Saving objects...", object);
 	    object.save( this._client );
 	});
     }
