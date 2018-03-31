@@ -781,10 +781,10 @@ function main(){
     });
 
     httpEventEmitter.on('end', ()=>{
-	console.log("all finished");
-	ogameData.forEach( ( element ) => {
+	ogameData.save();
+	/*ogameData.forEach( ( element ) => {
 	    console.log(element);
-	});
+	});*/
     });
 }
 
