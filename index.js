@@ -381,7 +381,8 @@ class RedisObjects extends Array{
 
 		retrieveEventEmitter.on("finish", ()=>{
 		    ++count;
-		    if ( count === 4 )
+		    console.log(count / this.length);
+		    if ( count === this.length )
 			callback(this);
 		});
 		
