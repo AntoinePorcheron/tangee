@@ -360,7 +360,7 @@ class RedisObjects extends Array{
 		++count;
 		object.retrieve( this._client );
 		if ( count === object.length - 1 )
-		    
+		    callback(this);
 	    });
 	}
     }
