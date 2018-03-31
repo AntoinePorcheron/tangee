@@ -62,7 +62,7 @@ let httpEventEmitter = new HttpEventEmitter();
 class NotImplemented extends Error{
     constructor(){
 	super();
-	this.message = "This class method isn't implemented. This mean this is an abstract class";
+	this.message = "This class method isn't implemented. This mean this is an abstract class.";
     }
 }
 
@@ -72,7 +72,17 @@ class NotImplemented extends Error{
 class RedisError extends Error{
     constructor( error ){
 	super();
-	this.messag = `Error ${error} occured when trying to retrieve data from a redis server.`; 
+	this.message = `Error ${error} occured when trying to retrieve data from a redis server.`; 
+    }
+}
+
+/**
+ * Class that warn user that no redis client was set on the RedisObjects class.
+ */
+class NoRedisClientError extends Error{
+    constructor(){
+	super();
+	this.message = "No redis client was set, so the request can't be resolved.";
     }
 }
 
@@ -320,26 +330,34 @@ class RedisObjects extends Array{
 
     }
 
-    get objects(){
-	return this._objects;
+    set redisClient(redisClient){
+	this._client = redisClient;
     }
 
     /**
      * Save all the objects on the redis database.
      */
     save(){
-	this.forEach( ( object ) => {
-	    object.save( this._client );
-	});
+	if ( isUndefined( this._client ) )
+	    throw new NoRedisClientError();
+	else{
+	    this.forEach( ( object ) => {
+		object.save( this._client );
+	    });
+	}
     }
 
     /**
      * Retrieve objects from the redis database.
      */
     retrieve(){
-	this._objects.forEach( ( object ) => {
-	    object.retrieve( this._client );
-	});
+	if ( isUndefined( this._client ) )
+	    throw new NoRedisClientError();
+	else{
+	    this._objects.forEach( ( object ) => {
+		object.retrieve( this._client );
+	    });
+	}
     }
 }
 
@@ -884,13 +902,19 @@ class LinkBuilder{
 function main(){
     let redis_client = redis.createClient( { 'password' : redis_password.password } );
 
-    retrieveAPIData(136, 'fr', redis_client, (datas) => {
+    /*retrieveAPIData(136, 'fr', (datas) => {
 	datas.forEach( (data) => {
 	    console.log(data);
 	});
-    });
+    });*/
 
     //redisEventEmitter.emit('end');
+
+    retrieveRedisData( redis_client, ( reply ) => {
+	reply.forEach( ( e ) => {
+	    console.log(e);
+	});
+    });
 
     redisEventEmitter.on('end', ()=>{
 	redis_client.quit();
