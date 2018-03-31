@@ -378,10 +378,10 @@ class RedisObjects extends Array{
 	    let count = 0;
 	    this.forEach( ( object ) => {
 		object.retrieve( this._client );
-
 		retrieveEventEmitter.on("finish", ()=>{
 		    ++count;
-		    if ( count === this.length )
+		    console.log(count);
+		    if ( count === this.length - 1 )
 			callback(this);
 		});
 		
