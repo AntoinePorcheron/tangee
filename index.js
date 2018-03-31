@@ -6,6 +6,7 @@ const https = require("https");
 const redis = require("redis");
 const { parseString } = require("xml2js");
 //const { promisify } = require("util"); //Not used for the moment
+const redis_password = require("./redis_password");
 
 /**
  * TODO : 
@@ -732,8 +733,7 @@ class LinkBuilder{
 
 function main(){
     let linkBuilder = new LinkBuilder({'id' : 136, 'country' : 'fr'});
-    let ogameData = new RedisObjects(redis.createClient());
-
+    let ogameData = new RedisObjects(redis.createClient( { 'password' : redis_password.password } ));
     let counter = 0;
     
     linkBuilder.target('universe');
