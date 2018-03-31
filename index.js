@@ -295,8 +295,8 @@ function retrieveRedisData( redis_client, callback ){
     redisEventEmitter.on('end', () => {
 	++counter;
 	if ( counter == 4 ){
-	    redis_objects.retrieve();
-	    callback( redis_objects );
+	    redis_objects.retrieve( callback );
+	    /*callback( redis_objects );*/
 	}
 	
     });
@@ -349,13 +349,18 @@ class RedisObjects extends Array{
 
     /**
      * Retrieve objects from the redis database.
+     * @param callback : function to call when the retrieve process is over.
      */
-    retrieve(){
+    retrieve( callback ){
 	if ( isUndefined( this._client ) )
 	    throw new NoRedisClientError();
 	else{
+	    let count = 0;
 	    this.forEach( ( object ) => {
+		++count;
 		object.retrieve( this._client );
+		if ( count === object.length - 1 )
+		    
 	    });
 	}
     }
